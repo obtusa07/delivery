@@ -11,3 +11,20 @@ services:
       - '3001:3000'
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
+  postgres_user:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - '6001:5432'
+    volumes:
+      - ./postgres/user:/var/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
