@@ -7,6 +7,11 @@ services:
       dockerfile: ./apps/user/Dockerfile
       target: development
     command: pnpm run start:dev user
+    depends_on:
+      postgres_user:
+        condition: service_healthy
+    env_file:
+      - ./apps/user/.env
     ports:
       - '3001:3000'
     volumes:
