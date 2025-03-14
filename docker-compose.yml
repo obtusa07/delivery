@@ -33,3 +33,17 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+
+  product:
+    build:
+      context: .
+      dockerfile: ./apps/product/Dockerfile
+      target: development
+    command: pnpm run start:dev product
+    depends_on:
+      postgres_product:
+        condition: service_healthy
+    env_file:
+      - ./apps/product/.env
+    ports:
+      -
