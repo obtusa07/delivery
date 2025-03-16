@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { RegisterDto } from './dto/register-dto';
 import { Repository } from 'typeorm';
@@ -27,6 +27,44 @@ export class AuthService {
             password
         });
     }
+
+    async parseBearerToken(rawToken: string, isRefreshToken: boolean) {
+        const basicSplit = rawToken.split(' ');
+        if (basicSplit.length !== 2) {
+            throw new BadRequestException('Wrong Token format');
+        }
+
+        const [basic, token] = basicSplit;
+        if (basic.toLowerCase() !== 'basic') {
+            throw new BadRequestException('Wrong Token format');
+        }
+
+        try {
+            const payload = await this.jwtService.verifyAsync(
+                token,
+                {
+                    secret: this.configService.getOrThrow<string>(
+                        isRefreshToken ? 'REFRESH_TOKEN_SECRET' : 'ACCESS_TOKEN_SECRET'
+                    )
+                }
+            );
+
+            if (isRefreshToken) {
+                if (payload.type !== 'refresh') {
+                    throw new BadRequestException('It is not refresh token');
+                }
+            } else {
+                if (payload.type !== 'access') {
+                    throw new BadRequestException('It is not access token');
+                }
+            };
+
+            return payload;
+        } catch (e) {
+            throw new UnauthorizedException('Token is expiryed');
+        }
+    }
+
     parseBasicToken(rawToken: string) {
         const basicSplit = rawToken.split(' ')
 
