@@ -32,7 +32,6 @@ export class OrderService {
   async getUserFromToken(token: string) {
     // verify token
     const response = await lastValueFrom(this.userService.send({ cmd: 'parse_bearer_token' }, { token }))
-    console.log("경고경고경고")
     console.log(response)
     // get user info
   }

@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import * as Joi from 'joi';
 import { MongooseModule } from "@nestjs/mongoose";
 import { ClientsModule, Transport } from "@nestjs/microservices";
+import { USER_SERVICE } from "@app/common";
 
 @Module({
     imports: [
@@ -24,14 +25,15 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
         }),
         ClientsModule.registerAsync({
             clients: [{
-                name: 'USER_SERVICE',
-                useFactory: (ConfigService: ConfigService) => ({
+                name: USER_SERVICE,
+                useFactory: (configService: ConfigService) => ({
                     transport: Transport.TCP,
                     options: {
-                        host: ConfigService.getOrThrow<string>('USER_HOST'),
-                        port: ConfigService.getOrThrow<number>('USER_TCP_PORT'),
+                        host: configService.getOrThrow<string>('USER_HOST'),
+                        port: configService.getOrThrow<number>('USER_TCP_PORT'),
                     }
-                })
+                }),
+                inject: [ConfigService]
             }],
             isGlobal: true,
         }),

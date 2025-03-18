@@ -35,7 +35,7 @@ export class AuthService {
         }
 
         const [basic, token] = basicSplit;
-        if (basic.toLowerCase() !== 'basic') {
+        if (basic.toLowerCase() !== 'bearer') {
             throw new BadRequestException('Wrong Token format');
         }
 
